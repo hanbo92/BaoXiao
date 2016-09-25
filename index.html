@@ -1,0 +1,688 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Right</title>
+<style type="text/css">
+@media print { 
+ .noprint{display:none;}
+}
+<!--
+body {
+	margin-left: 1px;
+	margin-top: 0px;
+	margin-right: 1px;
+	margin-bottom: 0px;
+  font-size: 16px;
+}
+.STYLE10 {color: #000000; font-size: 26px; }
+.STYLE18 {color: #000000;font-size: 15px; }
+table { 
+  border-collapse:collapse;
+}
+td input{
+background-color:#FFFFFF;
+border:none;
+font-size: 15px;
+}
+tr{
+  height: 22px;
+}
+td{
+  border-top-style: solid; border-top-width: 1px; border-top-color:#000000;
+  border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color:#000000;
+  border-left-style: solid; border-left-width: 1px; border-left-color:#000000;
+  border-right-style: solid; border-right-width: 1px; border-right-color:#000000;
+}
+.td_null_border{
+  border-top-style: solid; border-top-width: 0px; border-top-color:#000000;
+  border-bottom-style: solid; border-bottom-width: 0px; border-bottom-color:#000000;
+  border-left-style: solid; border-left-width: 0px; border-left-color:#000000;
+  border-right-style: solid; border-right-width: 0px; border-right-color:#000000;
+}
+.td_top{
+  border-top-style: solid; border-top-width: 1px; border-top-color:#000000;
+  border-bottom-style: solid; border-bottom-width: 0px; border-bottom-color:#000000;
+  border-left-style: solid; border-left-width: 0px; border-left-color:#000000;
+  border-right-style: solid; border-right-width: 0px; border-right-color:#000000;
+}
+.td_right{
+  border-top-style: solid; border-top-width: 0px; border-top-color:#000000;
+  border-bottom-style: solid; border-bottom-width: 0px; border-bottom-color:#000000;
+  border-left-style: solid; border-left-width: 0px; border-left-color:#000000;
+  border-right-style: solid; border-right-width: 1px; border-right-color:#000000;
+}
+.td_null_bottom{
+  border-top-style: solid; border-top-width: 1px; border-top-color:#000000;
+  border-bottom-style: solid; border-bottom-width: 0px; border-bottom-color:#000000;
+  border-left-style: solid; border-left-width: 1px; border-left-color:#000000;
+  border-right-style: solid; border-right-width: 1px; border-right-color:#000000;
+}
+.DivSelect{
+    position: relative;
+    background-color: transparent;
+    width:  100px;
+    height: 17px;
+    overflow: hidden;
+    border-width:0px;
+    border-top-style: none; 
+    border-right-style: none; 
+    border-left-style: none; 
+    border-bottom-style: none;
+    font-size: 15px;
+}
+
+.DivSelect2{
+    position: relative;
+    background-color: transparent;
+    width:  230px;
+    height: 17px;
+    overflow: hidden;
+    border-width:0px;
+    border-top-style: none; 
+    border-right-style: none; 
+    border-left-style: none; 
+    border-bottom-style: none;
+    font-size: 15px;
+}
+
+.SelectList{
+    position: relative;
+    background-color: transparent;
+    top:-2px;
+    left:0px;
+    border-width: 0px;
+    border-top-style: none; 
+    border-right-style: none; 
+    border-left-style: none; 
+    border-bottom-style: none;
+    width:250px;
+    display:block;
+    height: 22px;
+    overflow:hidden;
+    font-size: 15px;
+}
+-->
+</style>
+<script type="text/javascript">
+  var rate = 0.5;
+  var genealfee = 10;
+  var index=0;//记录表格id
+  var rowNum=1;//记录表格行数
+  var total = 1;//记录总药品数
+
+  var data = new Array();
+  
+  function ReadExcel()
+  {
+  	 for(var i=0;i<1000;i++) {
+      	data[i] = new Array();
+     }
+     var pathName = window.document.location.pathname;
+
+     var location = pathName.substring(1,pathName.substr(1).lastIndexOf('/')+1);
+     var filePath = location+"\\药品目录.xls";
+     var oXL = new ActiveXObject("Excel.application"); 
+     var oWB = oXL.Workbooks.open(filePath);
+     oWB.worksheets(1).select(); 
+     var oSheet = oWB.ActiveSheet;
+     try{
+      for(var i=2;i<1000;i++)
+      {
+       if(oSheet.Cells(i,1).value =="null" || oSheet.Cells(i,2).value =="null" )
+        break;
+       var a = oSheet.Cells(i,1).value.toString()=="undefined"?"":oSheet.Cells(i,1).value;
+       data[i-2][0] = oSheet.Cells(i,1).value;
+       data[i-2][1] = oSheet.Cells(i,2).value;
+       data[i-2][2] = oSheet.Cells(i,3).value;
+       data[i-2][3] = oSheet.Cells(i,4).value;
+       data[i-2][4] = oSheet.Cells(i,5).value;
+      }
+     }catch(e){} 
+     oXL.Quit();
+     CollectGarbage();
+	}
+	
+	function addOpt(e) {
+
+     var medc = document.getElementsByName("fno");
+     for (var i=e-1;i<medc.length-1;i++) {
+	     for (var j=0;j<1000;j++) {
+	     	if (data[j][0] == null) break;
+	     	var opt = document.createElement("option");
+	     	medc[i].appendChild(opt);
+	    	opt.value = j;
+	    	opt.text = data[j][0];
+	     }
+	  }
+	}
+	function choosemedc(e) {
+		var chg = total-1;
+		var colNum = e.value;
+		var guige = document.getElementsByName("guige");
+		var chandi = document.getElementsByName("chandi");
+		var danwei = document.getElementsByName("danwei");
+		var fqty = document.getElementsByName("fqty");
+		guige[chg].value = data[colNum][1];
+		chandi[chg].value = data[colNum][2];
+		danwei[chg].value = data[colNum][3];
+		fqty[chg].value = data[colNum][4];
+	}
+  /*
+  插入新表格
+  */
+  function AddTable(){
+  
+  var general=document.getElementById("general"+index);
+  general.parentNode.removeChild(general);
+	
+  index++;
+  var tableDiv=document.getElementById("tableDiv");
+  var table0 = document.createElement("table");
+  table0.border="0";
+  table0.cellpadding="0";
+  table0.cellspacing="0";
+  table0.width="960px";
+  table0.innerHTML='&nbsp;&nbsp;<br/><br/><br/><br/><br/></br><br/><tr><td class="td_null_border" colspan="7"><div align="center"><span class="STYLE10">平度市村卫生室统一票据</span></div></td></tr>';
+	var table = document.createElement("table");
+	table.id="table"+index;
+	table.border="0";
+	table.cellpadding="0";
+	table.cellspacing="0";
+	table.width="960px";
+	table.innerHTML='<tr><td>'
+	+'<table rules=cols width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td class="td_right" width="40%"><div align="left">&nbsp;联系电话:</div></td>'
+    +'<td class="td_null_border"><input name="number" style="width: 99%;" onchange="update_table_header(this)"></input></td></tr></table></td>'
+    +'<td><div align="center">就诊时间:</div></td>'
+    +'<td colspan="2"><div align="left">&nbsp;&nbsp;<span name="Clock"></span></div></td>'
+    +'<td colspan="3" class="td_null_border">'
+	+'<table width="80%" border="0" cellpadding="0" cellspacing="0">'
+	+'<tr>'
+	+'<td class="td_top" width="30%"><div align="center">序列号:</div></td>'
+	+'<td class="td_null_bottom"><input name="nos" style="width: 98%;" onchange="update_table_header(this)"></input></td>'
+	+'</tr>'
+	+'</table>'
+	+'</td>'
+	+'</tr>'
+	+'<tr>'
+	+'<td>'
+	+'<table rules=cols width="100%" border="0" cellpadding="0" cellspacing="0">'
+	+'<tr>'
+	+'<td class="td_right" width="40%"><div align="center">姓名</div></td>'
+	+'<td class="td_null_border"><input name="names" style="width: 99%;" onchange="update_table_header(this)"></input></td>'
+	+'</tr>'
+	+'</table>'
+	+'</td>'
+	+'<td><div align="center">性别</div></td>'
+	+'<td><div class="DivSelect">'
+	+'<select class="SelectList" name="sexs" onchange="update_table_header(this)">'
+	+'<option value="1">男性</option>'
+	+'<option value="2">女性</option>'
+	+'</select>'
+	+'</div></td>'
+	+'<td><div align="center">年龄</div></td>'
+	+'<td><input name="ages" style="text-align:right; width: 99%;" onchange="update_table_header(this)"></input></td>'
+	+'<td><div align="center">类别</div></td>'
+	+'<td><input name="types" style="width: 99%;" onchange="update_table_header(this)"></input></td>'
+	+'</tr>'
++'	<tr>'
++'	<td><div align="center">医保/新农合卡号</div></td>'
++'	<td colspan="2"><input name="yibaonos" style="width: 99%;" onchange="update_table_header(this)"></input></td>'
++'	<td><div align="center">诊断</div></td>'
++'	<td colspan="3"><input name="zhenduans" style="width: 99%;" onchange="update_table_header(this)"></input></td>'
++'	</tr>'
++'	<tr height="17px">'
++'	<td width="25%"><div align="center">项目名称</div></td>'
++'	<td width="20%"><div align="center">规格</div></td>'
++'	<td width="10%"><div align="center">产地</div></td>'
++'	<td width="10%"><div align="center">单位</div></td>'
++'	<td width="10%"><div align="center">单价</div></td>'
++'	<td width="10%"><div align="center">数量</div></td>'
++'	<td width="15%"><div align="center">金额</div></td>'
++'	</tr>'
++' <tr class="tit3">'
++'   <td width="25%">'
++'    	<div class="DivSelect2">'
++'    		<select class="SelectList" name="fno" id="medicine" onchange="choosemedc(this);">'
++'    			<option value="-1" selected="selected"></option>'
++'    		</select>'
++'    	</div>'
++'    </td>'
++'    <td width="20%"><input type="text" name="guige" style="width: 99%;height: 90%;"></td>'
++'    <td width="10%"><input type="text" name="chandi" style="width: 98%;height: 90%;"></td>'
++'    <td width="10%"><input type="text" name="danwei" style="width: 98%;height: 90%;"></td>'
++'    <td width="10%"><input type="text" name="fqty" style="text-align:right; width: 98%;height: 90%;" onchange="chtotal(this);"></input></td>'
++'    <td width="10%"><input type="text" name="fprice" style="text-align:right; width: 98%;height: 90%;" onchange="chtotal(this);"></input></td>'
++'    <td width="15%"><input type="text" name="ftotal" style="text-align:right; width: 98%;height: 90%;" value="0" readonly></input></td>'
++'  </tr>'
++'	<tr id="general'+index+'" class="tit3">'
++'	<td width="25%"><input name="fno" style="width: 99%;" value="一般诊疗费" readonly></input></td>'
++'	<td width="20%"><input style="width: 99%;" value="无"readonly></input></td>'
++'	<td width="10%"><input style="width: 99%;" value="无"readonly></input></td>'
++'	<td width="10%"><input style="width: 99%;" value="无"readonly></input></td>'
++'	<td width="10%"><input type="text" name="fqty" style="text-align:right; width: 99%;"onchange="chtotal(this);" value="10"></input></td>'
++'	<td width="10%"><input type="text" name="fprice" style="text-align:right; width: 99%;"onchange="chtotal(this);" value="1"></input></td>'
++'	<td width="15%"><input type="text" name="ftotal" style="text-align:right; width: 99%;"value="10.00"" readonly></input></td>'
++'	</tr>'
++'	<tr class="tit3" height="17px">'
++'	<td width="25%" ><div align="center">合计人民币(大写)</div></td>'
++'	<td class="STYLE19" colspan="6"><b name="znum">0</b></td>'
++'	</tr>'
++'	<tr class="tit3" height="17px">'
++'	<td ><div align="center">医保/新农合报销</div></td>'
++'	<td width="18%"><div align="right"><b name="baoxiao">0</b></div></td>'
++'	<td width="15%"><div align="center">自负</div></td>'
++'	<td colspan="4"><div align="right"><b name="zifu">0</b></div></td>'
++'	</tr>';
+	var table2 = document.createElement("table");
+	table2.border="0";
+	table2.cellpadding="0";
+	table2.cellspacing="0";
+	table2.width="960px";
+	table2.innerHTML='<table width="960px" align="center" border="0" cellpadding="0" cellspacing="0">'
++'	<tr>'
++'	<td class="td_null_border" width="25.1%" colspan="2"><div align="center">收费单位</div></td>'
++'	<td class="td_null_border" width="25.9%" colspan="2" ><div align="left"><span class="STYLE18">崔家集镇塔西坡村卫生所</span></div></td>'
++'	<td class="td_null_border" width="10%"><div align="left">医生</div></td>'
++'	<td class="td_null_border"><div align="left"><span class="STYLE18">李月强</span></div></td>'
++'	<td class="td_null_border"><div align="center">收费人</div></td>'
++'	<td class="td_null_border"><div align="left"><span class="STYLE18">李月强</span></div></td>'
++'	</tr></br></br>';
+  	tableDiv.appendChild(table0);
+	tableDiv.appendChild(table);
+	tableDiv.appendChild(table2);
+	addOpt(total);
+  }
+  /*
+  增加记录，大于八条则添加新表格
+  */
+  function AddRecord()
+  {
+	  total ++;
+	  if(rowNum>7)
+	  {
+		rowNum=1;
+		AddTable();
+		value_init();
+		return;
+	  }
+	  var tableId=document.getElementById("table"+index);
+	  AddRow(tableId);
+	  rowNum++;
+	  addOpt(total);
+  }
+  /*
+  增加记录条数
+  */
+  function AddRow(tableId) {
+    
+    var  row  =  tableId.insertRow(tableId.rows.length-3);  
+    row.className='tit3';   
+    var  col  =  row.insertCell(0);
+    col.innerHTML  =  " <div class='DivSelect2'>" + 
+    		"<select class='SelectList' name='fno' id='medicine' onchange='choosemedc(this);'> "+
+    			"<option value='-1' selected='selected'></option></select></div>";
+    col  =  row.insertCell(1);     
+    col.innerHTML  =  " <input type='text' name='guige' style='width: 99%;height: 90%;'>";    
+    col  =  row.insertCell(2);     
+    col.innerHTML  =  " <input type='text' name='chandi' style='width: 98%;height: 90%;'>";   
+    col  =  row.insertCell(3);     
+    col.innerHTML  =  " <input type='text' name='danwei' style='width: 98%;height: 90%;'>";
+    col  =  row.insertCell(4);  
+    col.innerHTML  =  " <input type='text' name='fqty' style='text-align:right; width: 98%;height: 90%;' onchange='chtotal(this);'>";
+    col  =  row.insertCell(5);     
+    col.innerHTML  =  " <input type='text' name='fprice' style='text-align:right; width: 98%;height: 90%;' onchange='chtotal(this);'>";     
+    col  =  row.insertCell(6);     
+    col.innerHTML="<input type='text' name='ftotal' style='text-align:right; width: 98%;height: 90%;' value='0' readonly>";
+  }  
+	/*
+	 计算总价
+	 */
+function chtotal(e) { 
+  
+  /*有数据改变时，计算总价*/
+  var fqty=document.getElementsByName("fqty");  
+  var fprice=document.getElementsByName("fprice");  
+  var ftotal=document.getElementsByName("ftotal");  
+  var fno=document.getElementsByName("fno");  
+  var znum= document.getElementsByName("znum");
+  var baoxiao=document.getElementsByName("baoxiao");
+  var zifu=document.getElementsByName("zifu");
+  var totalprice=0;
+  for(i=0;i<ftotal.length;i++)
+  {
+	ftotal[i].value=(fqty[i].value * fprice[i].value).toFixed(2);
+	totalprice+=parseFloat(ftotal[i].value);
+  }
+  totalprice-=genealfee;
+  var bx = (totalprice * rate + genealfee * 0.9).toFixed(2);
+  var zf = (totalprice - bx+genealfee).toFixed(2);
+  
+  /*同步更新所有表格中的数据*/
+  for(i=0;i<zifu.length;i++)//三者数量相同
+  {
+	znum[i].innerHTML = DX((totalprice+genealfee).toFixed(2));
+	baoxiao[i].innerHTML = bx;
+	zifu[i].innerHTML = zf;
+  }
+}
+/*
+  更新表头数据
+  */
+  function update_table_header(e)
+  {
+	var tdType=e.name;
+	var tmp=e.value;
+	switch(tdType)
+	{
+    case "number":
+    var values=document.getElementsByName("number");
+    for(i=0;i<values.length;i++)
+    {
+      values[i].value=tmp;
+    }
+    break;
+    case "nos":
+    var values=document.getElementsByName("nos");
+    for(i=0;i<values.length;i++)
+    {
+      values[i].value=tmp;
+    }
+    break;
+		case "names":
+		var values=document.getElementsByName("names"); 
+		for(i=0;i<values.length;i++)
+		{
+			values[i].value=tmp;
+		}
+		break;
+		case "ages":
+		var values=document.getElementsByName("ages"); 
+		for(i=0;i<values.length;i++)
+		{
+			values[i].value=tmp;
+		}
+		break;
+		case "types":
+		var values=document.getElementsByName("types"); 
+		for(i=0;i<values.length;i++)
+		{
+			values[i].value=tmp;
+		}
+		break;
+		case "yibaonos":
+		var values=document.getElementsByName("yibaonos"); 
+		for(i=0;i<values.length;i++)
+		{
+			values[i].value=tmp;
+		}
+		break;
+		case "zhenduans":
+		var values=document.getElementsByName("zhenduans"); 
+		for(i=0;i<values.length;i++)
+		{
+			values[i].value=tmp;
+		}
+		break;
+		case "sexs":
+		var values=document.getElementsByName("sexs"); 
+		for(i=0;i<values.length;i++)
+		{
+			values[i].value=tmp;
+		}
+		break;
+	}
+	
+  }
+  /*
+  新建表格数据初始化为第一个表数据
+  */
+  function value_init()
+  {	
+  var number=document.getElementsByName("number");
+  var nos=document.getElementsByName("nos");
+	var names=document.getElementsByName("names");
+	var ages=document.getElementsByName("ages"); 
+	var types=document.getElementsByName("types");
+	var yibaonos=document.getElementsByName("yibaonos");
+	var zhenduans=document.getElementsByName("zhenduans"); 
+	var sexs=document.getElementsByName("sexs"); 
+	for(var i=1;i<names.length;i++)
+	{
+    number[i].value=number[0].value;
+    nos[i].value=nos[0].value;
+		names[i].value=names[0].value;
+		ages[i].value=ages[0].value;
+		types[i].value=types[0].value;
+		yibaonos[i].value=yibaonos[0].value;
+		zhenduans[i].value=zhenduans[0].value;
+		sexs[i].value=sexs[0].value;
+	}
+  }
+/*
+  大写数据
+  */
+function DX(num) {
+  var strOutput = "",
+  strUnit = '仟佰拾亿仟佰拾万仟佰拾元角分';
+  num += "00";
+  var intPos = num.indexOf('.');
+  if (intPos >= 0){
+  num = num.substring(0, intPos) + num.substr(intPos + 1, 2);
+  }
+  strUnit = strUnit.substr(strUnit.length - num.length);
+  for (var i=0; i < num.length; i++){
+  strOutput += '零壹贰叁肆伍陆柒捌玖'.substr(num.substr(i,1),1) + strUnit.substr(i,1);
+  }
+  return strOutput.replace(/零角零分$/, '整').replace(/零[仟佰拾]/g, '零').replace(/零{2,}/g, '零').replace(/零([亿|万])/g, '$1').replace(/零+元/, '元').replace(/亿零{0,3}万/, '亿').replace(/^元/, "零元")
+}
+/*
+  时钟
+  */
+function tick() {
+    var years,months,days,hours, minutes, seconds;
+    var intYears,intMonths,intDays,intHours, intMinutes, intSeconds;
+    var today;
+    today = new Date();
+    intYears = today.getFullYear();
+    intMonths = today.getMonth() + 1;
+    intDays = today.getDate();
+    intHours = today.getHours();
+    intMinutes = today.getMinutes();
+    intSeconds = today.getSeconds();
+    years = intYears + "-";    
+        
+    if(intMonths < 10 ){
+     months = "0" + intMonths +"-";
+    } else {
+     months = intMonths +"-";
+    }
+    if(intDays < 10 ){
+     days = "0" + intDays +"  ";
+    } else {
+     days = intDays + "  ";
+    }
+    if (intHours == 0) {
+    hours = "00:";
+    } else if (intHours < 10) {
+    hours = "0" + intHours+":";
+    } else {
+    hours = intHours + ":";
+    }
+    if (intMinutes < 10) {
+    minutes = "0"+intMinutes+":";
+    } else {
+    minutes = intMinutes+":";
+    }
+    if (intSeconds < 10) {
+    seconds = "0"+intSeconds+" ";
+    } else {
+    seconds = intSeconds+" ";
+    }
+    timeString = years+months+days+hours+minutes+seconds;
+	//循环处理所有表格时间
+	var clocks=document.getElementsByName("Clock");
+	for(i=0;i<clocks.length;i++)
+	{
+		clocks[i].innerHTML=timeString;
+	}
+    //Clock.innerHTML = timeString;
+    window.setTimeout("tick();", 1000);
+  }
+   window.onload = tick;
+
+  function printsetup(){ 
+　　   wb.execwb(8,1); 
+　} 
+　function printpreview(){ 
+　　   wb.execwb(7,1); 
+　} 
+　function printit() { 
+	　if (confirm('确定打印吗？')) { 
+	　　   wb.execwb(6,6) 
+	　} 
+　}
+</script>
+
+</head>
+<!--align="center" width="960px" border="1" cellpadding="0" cellspacing="0"-->
+<body>
+  <script type="text/javascript">ReadExcel();</script>
+  <th colspan="7"><div align="center"><span class="STYLE10">平度市村卫生室统一票据</span></div></th>
+  <div id="tableDiv" align="center">
+  <table id="table0" align="center" width="960px" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td>
+      <table rules=cols width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="td_right" width="40%"><div align="left">&nbsp;联系电话:</div></td>
+          <td class="td_null_border"><input name="number" style="width: 98%;height: 90%;" onchange="update_table_header(this)"></input></td>
+        </tr>
+      </table>
+    </td>
+    <td><div align="center">就诊时间:</div></td>
+    <td colspan="2"><div align="left">&nbsp;&nbsp;<span name="Clock"></span></div></td>
+    <td colspan="3" class="td_null_border">
+      <table width="80%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="td_top" width="30%"><div align="center">序列号:</div></td>
+          <td class="td_null_bottom"><input name="nos" style="width: 98%;height: 90%;" onchange="update_table_header(this)"></input></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <table rules=cols width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="td_right" width="40%"><div align="center">姓名</div></td>
+          <td class="td_null_border"><input name="names" style="width: 98%;height: 90%;" onchange="update_table_header(this)"></input></td>
+        </tr>
+      </table>
+    </td>
+    <td><div align="center">性别</div></td>
+    <td><div class="DivSelect">
+      <select class="SelectList" name="sexs" onchange="update_table_header(this)">
+        <option value="1">男性</option>
+        <option value="2">女性</option>
+      </select>
+    </div></td>
+    <td><div align="center">年龄</div></td>
+    <td><input style="text-align:right; width: 98%;height: 90%;" name="ages" onchange="update_table_header(this)"></input></td>
+    <td><div align="center">类别</div></td>
+    <td><input style="width: 98%;height: 90%;" name="types" onchange="update_table_header(this)"></input></td>
+  </tr>
+
+  <tr>
+    <td><div align="center">医保/新农合卡号</div></td>
+    <td colspan="2"><input style="width: 99%;height: 90%;" name="yibaonos" onchange="update_table_header(this)"></input></td>
+    <td><div align="center">诊断</div></td>
+    <td colspan="3"><input style="width: 99%;height: 90%;" name="zhenduans" onchange="update_table_header(this)"></input></td>
+  </tr>
+  <tr>
+    <td width="25%"><div align="center">项目名称</div></td>
+    <td width="20%"><div align="center">规格</div></td>
+    <td width="10%"><div align="center">产地</div></td>
+    <td width="10%"><div align="center">单位</div></td>
+    <td width="10%"><div align="center">单价</div></td>
+    <td width="10%"><div align="center">数量</div></td>
+    <td width="15%"><div align="center">金额</div></td>
+  </tr>
+
+  <tr class="tit3">
+    <td width="25%">
+    	<div class="DivSelect2">
+    		<select class="SelectList" name="fno" id="medicine" onchange="choosemedc(this);">
+    			<option value="-1" selected="selected"></option>
+    		</select>
+    	</div>
+    </td>
+    <td width="20%">
+    	<input type="text" name="guige" style="width: 99%;height: 90%;">
+    </td>
+    <td width="10%">
+    	<input type="text" name="chandi" style="width: 98%;height: 90%;">
+    </td>
+    <td width="10%">
+    	<input type="text" name="danwei" style="width: 98%;height: 90%;">
+    </td>
+    <td width="10%"><input type="text" name="fqty" style="text-align:right; width: 98%;height: 90%;"
+    	onchange="chtotal(this);"></input>
+    </td>
+    <td width="10%"><input type="text" name="fprice" style="text-align:right; width: 98%;height: 90%;"
+      onchange="chtotal(this);"></input></td>
+    <td width="15%"><input type="text" name="ftotal" style="text-align:right; width: 98%;height: 90%;"
+      value='0' readonly></input></td>
+  </tr>
+
+  <tr id="general0" class="tit3">
+    <td width="25%">
+      <input name="fno" style="width: 99%;height: 90%;" value='一般诊疗费' readonly></input></td>
+    <td width="20%"><input style="width: 99%;height: 90%;" value='无' readonly></input></td>
+    <td width="10%"><input style="width: 98%;height: 90%;" value='无' readonly></input></td>
+    <td width="10%"><input style="width: 98%;height: 90%;" value='无' readonly></input></td>
+    <td width="10%"><input type="text" name="fqty" style="text-align:right; width: 98%;height: 90%;" 
+      value='10' onchange="chtotal(this);"></input></td>
+    <td width="10%"><input type="text" name="fprice" style="text-align:right; width: 98%;height: 90%;"
+      value='1' onchange="chtotal(this);"></input></td>
+    <td width="15%"><input type="text" name="ftotal" style="text-align:right; width: 98%;height: 90%;"
+      value='10.00' readonly></input></td>
+  </tr>
+
+  <tr class="tit3" height="17px">
+    <td width="25%" ><div align="center">合计人民币(大写)</div></td>
+    <td class="STYLE19" colspan="6"><b name="znum">0</b></td>
+  </tr>
+  <tr class="tit3" height="17px">
+    <td ><div align="center">医保/新农合报销</div></td>
+    <td width="18%"><div align="right"><b name="baoxiao">0</b></div></td>
+    <td width="15%"><div align="center">自负</div></td>
+    <td colspan="4"><div align="right"><b name="zifu">0</b></div></td>
+  </tr>
+</table>
+<script type="text/javascript">addOpt(1);</script>
+<table width="960px" align="center" border="0" cellpadding="2" cellspacing="0">
+  <tr>
+    <td class="td_null_border" width="25.1%" colspan="2"><div align="center">收费单位</div></td>
+    <td class="td_null_border" width="25.9%" colspan="2" ><div align="left"><span class="STYLE18">崔家集镇塔西坡村卫生所</span></div></td>
+    <td class="td_null_border" width="10%"><div align="left">医生</div></td>
+    <td class="td_null_border"><div align="left"><span class="STYLE18">李月强</span></div></td>
+    <td class="td_null_border"><div align="center">收费人</div></td>
+    <td class="td_null_border"><div align="left"><span class="STYLE18">李月强</span></div></td>
+  </tr>
+</table>
+</div>
+<table width="960px" align="center" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td class="td_null_border" height="24"><div class="noprint" style="text-align:right;">
+      	<OBJECT id=wb height=0 width=0 classid=CLSID:8856F961-340A-11D0-A96B-00C04FD705A2 name=wb></OBJECT> 
+        <button onClick="AddRecord()">增加条目</button>&nbsp;&nbsp;
+        <button onClick="printsetup()">打印设置</button>&nbsp;&nbsp;
+        <button onClick="printpreview()">打印预览</button>&nbsp;&nbsp;
+        <button onClick="printit()">打印账单</button>
+        </div></td>    
+    </tr>
+</table>
+</body>
+</html>
